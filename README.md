@@ -30,11 +30,11 @@ The model training requires a measure of the model performance, here we use the 
 
 The training Loss at each Epoch is shown below.
 
-![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/train_loss_vs_epoch.PNG)
+![plot](https://github.com/usamanaveed900/FAISS_API/blob/main/README_Images/Training%20Loss%20vs%20epoch.PNG)
 
 The comparison of the model performance on the evaluation data set also shows the potential of the cosine annealing method as it reaches a higher level of performance using less computation time compare to a 'flat' scheduler. 
 
-![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/eval_vs_epoch.PNG)
+![plot]()
 
 Finally, comparison of performance of 'cos' vs 'flat' on the test dataset gives
 
