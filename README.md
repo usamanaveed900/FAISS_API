@@ -1,58 +1,13 @@
 # FAISS FAST API
 ### Facebook Marketplace Image-based Recommendation
 
-In this project, we have implemented the FAST API in docker container, to be deployed in cloud. 
-
-In this project, we implement fastAPI-based API in a Docker container deployed in Amazon Cloud. This API provides methods that allow categorising images into 13 product categories and searching for similar images through the image database. The categorisation model is based on the [ResNet50](https://pytorch.org/vision/main/models/generated/torchvision.models.resnet50.html) neural network, while indexing is performed by the FAISSE indexing system. 
+In this project, we have implemented the FAST API in a docker container, to be deployed in the cloud. The API provides a method that is categorizing images into 13 product categories and searches for similar images from the image database. The model is based on ResNet50 neural networks and indexing is performed by the FAISS indexing.
 
 Key technologies used: Resnet50 neural network (Pytorch), FAISS indexing, FastAPI, Docker 
 
-## API Methods
-
-### GET Status
-
-https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/8425fc2f54bd0a422b376bb9ad932ede8cde7976/API_templates/api_get_health_check.py#L2-L10
-
-```  
-$ python API_templates/api_get_health_check.py 
-{'message': 'API is up and running!'}
-```
-### POST Image Embeding
-
-https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/8425fc2f54bd0a422b376bb9ad932ede8cde7976/API_templates/api_post_image_embedings.py#L5-L15  
-
-```  
-$python API_templates/api_post_image_embedings.py 
-{'features': [-4.232490062713623, 0.03285627439618111, 1.6369472742080688, 0.8700776100158691, -1.2164239883422852, -8.073017120361328, -1.5977203845977783, -1.7229307889938354, 0.9121789336204529, 11.23184871673584, 1.3296902179718018, -3.1180896759033203, 4.341047286987305]}
-```
-
-### POST Image Category
-
-https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/8425fc2f54bd0a422b376bb9ad932ede8cde7976/API_templates/api_post_category.py#L10-L20
-
-```  
-$python API_templates/api_post_category.py 
-{'category_index': 9, 'category': 'Phones, Mobile Phones & Telecoms'}
-```
-After proccessing:
-
-![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/query_to_index.png)
-
-### POST Similar Images From Base
-
-https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/8425fc2f54bd0a422b376bb9ad932ede8cde7976/API_templates/api_post_similar_images.py#L10-L21
-
-```
-$python API_templates/api_post_similar_images.py 
-{'similar_index': [6788, 7159, 5983, 2210], 'image_labels': ['c26d58d9-91d9-4112-9c35-b50b1bf67ce4', '00ca700f-1055-43a1-b288-0193c7518347', '3ec76c1f-8dbc-429c-a7c9-85749227a06c', '136ab3a8-d0f1-4d8f-9a2e-c393d2dbb286']}
-```
-After proccessing:
-
-![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/index_test_query.png)
-
 # Model 
 
-In this project, we use the resnet50 neural network, which is a convolutional neural network and can be used for image classification tasks. To improve the efficiency of categorization, we use the transfer learning approach, which is to take a pre-trained neural network and tunes it for a specific task. In our case, we load the weights of the resnet50 model "IMAGENET1K_V2" which is trained on the imagenet dataset to perform a classification into 1k different classes. Since we have 13 product categories in total, we need to resize the classification layer and retrain the model based on our database. The training images are provided by the AICore training program.
+The model used is the ResNet50 neural network, which is a CNN and can be used for image classification. to make efficient categorization we used the transfer learning approach and load the weights of the resnet50 model "IMAGENET1k_V2" which is trained to perform classification on 1K different classes. As we only had 13 classes, we need to resize the model classification layers and unfreeze the last 2 layers of the pre-trained model. This way our model adopts more to our database.
 
 ## Data preparation
 
@@ -115,3 +70,47 @@ and get the following response
 ![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/userimage_response.png)
 
 A noticeable feature, that we got three images of a laptop with turned on display.
+
+## API Methods
+
+### GET Status
+
+https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/8425fc2f54bd0a422b376bb9ad932ede8cde7976/API_templates/api_get_health_check.py#L2-L10
+
+```  
+$ python API_templates/api_get_health_check.py 
+{'message': 'API is up and running!'}
+```
+### POST Image Embeding
+
+https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/8425fc2f54bd0a422b376bb9ad932ede8cde7976/API_templates/api_post_image_embedings.py#L5-L15  
+
+```  
+$python API_templates/api_post_image_embedings.py 
+{'features': [-4.232490062713623, 0.03285627439618111, 1.6369472742080688, 0.8700776100158691, -1.2164239883422852, -8.073017120361328, -1.5977203845977783, -1.7229307889938354, 0.9121789336204529, 11.23184871673584, 1.3296902179718018, -3.1180896759033203, 4.341047286987305]}
+```
+
+### POST Image Category
+
+https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/8425fc2f54bd0a422b376bb9ad932ede8cde7976/API_templates/api_post_category.py#L10-L20
+
+```  
+$python API_templates/api_post_category.py 
+{'category_index': 9, 'category': 'Phones, Mobile Phones & Telecoms'}
+```
+After proccessing:
+
+![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/query_to_index.png)
+
+### POST Similar Images From Base
+
+https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/8425fc2f54bd0a422b376bb9ad932ede8cde7976/API_templates/api_post_similar_images.py#L10-L21
+
+```
+$python API_templates/api_post_similar_images.py 
+{'similar_index': [6788, 7159, 5983, 2210], 'image_labels': ['c26d58d9-91d9-4112-9c35-b50b1bf67ce4', '00ca700f-1055-43a1-b288-0193c7518347', '3ec76c1f-8dbc-429c-a7c9-85749227a06c', '136ab3a8-d0f1-4d8f-9a2e-c393d2dbb286']}
+```
+After proccessing:
+
+![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/index_test_query.png)
+
