@@ -13,12 +13,11 @@ The model used is the ResNet50 neural network, which is a CNN and can be used fo
 
 The raw data contains two ".csv" tables and one "*.jpg" image archive. The first table "Products.csv" lists the market products grouped by listing ID ("product_id") with their classification and description, and the second table "Images.csv" maps the listing ID to the image_id corresponding to the label of the saved image.
 
-Let's start with processing text data. The cleanup starts by converting the "price" column to the correct "float" and removing all raw data, consisting of missing data or NaN data, from the "Products.csv" table. The "category" field contains a hierarchical structure separated by " / ". To train the model, we need to extract
-the root category and give each unique category an integer. We create dictionaries "decoder.pkl" and "encoder.pkl" to store maps for forward and reverse conversion. The "Image.csv" dataset maps products to images, where there are two images for each product. These images are photographs of products from different angles, so they may look very similar. Finally, we join the two tables on the "product_id" key, forming a dataset that displays the image tag with its category. The transformations described can be found in "sandbox.ipynb". Our images dataset contains "*.jpg" files of different resolution and aspect ratios. As the resnet50 is trained by the images of size 224x224, we need to transform it into the right resolution. The processing is performed in the script "clean_images_data.py"
+Let's start with processing text data. The cleanup starts by converting the "price" column to the correct "float" and removing all raw data, consisting of missing data or NaN data, from the "Products.csv" table. The processing is performed in the script "clean_tabular_data.py". The "category" field contains a hierarchical structure separated by " / ". To train the model, we need to extract the root category and give each unique category an integer. The "Image.csv" dataset maps products to images, where there are two images for each product. These images are photographs of products from different angles, so they may look very similar. Finally, we join the two tables on the "product_id" key, forming a dataset that displays the image tag with its category. The transformations described can be found in "sandbox.ipynb". Our images dataset contains "*.jpg" files of different resolution and aspect ratios. As the resnet50 is trained by the images of size 224x224, we need to transform it into the right resolution. The processing is performed in the script "clean_images.py"
 
 
 ## Model Training
-The initial dataset of 11121 categorised images is split into the 'work' (10k images) and 'test' (1121 images) datasets. We split the 'work' data into the 'evaluation' (30%) and 'training' (70%) parts during model training. Each dataset split is performed randomly, so each category is well represented in 'test' and 'training' data. 
+The initial dataset of 12604 categorized images is split into 'evaluation' (10%), 'training' (80%), and test (10%) for each batch from the data loader which has a batch size of 200.
 
 During the training procedure model update weights coefficients based on its performance on the training dataset. Each epoch (the round of iterations across 'training' data) we test model performance on the 'evaluation' dataset. As soon as we proceed through the desired number of epochs we test our model on our 'test' dataset, which is our final performance indicator. 
 
@@ -27,12 +26,9 @@ The dataloader used in the standard training routine (torch.utils.data.DataLoade
 
 ### Training procedure
 
-The model training requires a measure of the model performance, here we use the so-called cross-entropy losses criterion, which is standard for image classification procedures. Then to provide feedback on the model we use the stochastic gradient descent (SGD) method, which returns updated weights to the model more likely to provide convergence to local minima. One of the key parameters of SGD is the learning rate (lr). In the scope of this project, we compared two different schedulers to control the learning rate. First is the constant ('flat') lr=0.015 across the full training procedure. And the second is the cosine annealing scheduler, which is changing lr by following the cosine ('cos') function from lr_max = 0.015 to  lr_max = 1E-6 with a full period of 100 epochs. We simulated 300 epochs with batch size 200. The corresponding learning rate curves are specified below
+The model training requires a measure of the model performance, here we use the so-called cross-entropy losses criterion, which is standard for image classification procedures. Then to provide feedback on the model we use the ADAM method, which returns updated weights to the model more likely to provide convergence to local minima. One of the key parameters of ADAM is the learning rate (LR) which is set to be lr=0.001.
 
-
-![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/6353a2f544b069ecc63b1e82bda2c19ee5b22ea2/readme_images/lr_curve.PNG)
-
-The corresponding training loss rates suggest that the cosine annealing method is more likely to escape the local minima and has the potential to find higher-performing model weights, while the constant scheduler is prone to stick in the first-found minima with a lower probability of finding better-performing one.  
+The training Loss at each Epoch is shown below.
 
 ![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/train_loss_vs_epoch.PNG)
 
