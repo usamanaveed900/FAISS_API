@@ -32,81 +32,127 @@ The training Loss at each Epoch is shown below.
 
 ![plot](https://github.com/usamanaveed900/FAISS_API/blob/main/README_Images/Training%20Loss%20vs%20epoch.PNG)
 
-The comparison of the model performance on the evaluation data set also shows the potential of the cosine annealing method as it reaches a higher level of performance using less computation time compare to a 'flat' scheduler. 
+The model Accuracy on the evaluation split to compare the performance at each step of the epoch.
+![plot](https://github.com/usamanaveed900/FAISS_API/blob/main/README_Images/Training%20Accuracy%20vs%20epoch.PNG)
 
-![plot]()
+* Accuracy after 20 EPOCH = 60%
+* Accuracy after 150 EPOCH = 64%
 
-Finally, comparison of performance of 'cos' vs 'flat' on the test dataset gives
+During the 150 Epoch steps the Model hits the max Accuracy at 43 steps with an accuracy of around 66%.
 
-* Accuracy of 'cos' = 66.28%
-* Accuracy of 'flat' = 66.46%
+#### Note
+On CPU this model takes around 5 days to train for only 150 epoch.
 
-The tiny marginal difference can indicate that the parameters of the cosine annealing method were far from optimal and further work can be done to improve model performance. Such as
-* Use a smaller batch size
-* Increase the number of epochs (current simulation time performed at GeForce 1050 TI takes around 9.3 hours)
-* find the optimal period and amplitude for the cosine annealing method
-
-## Indexing
-After model training is over, the neural network can provide image embedding i.e. projection of the image onto the vector space 13 dimensions (categories). Once applied to the arbitrary image it returns an array of 13 float numbers, which indicates which category it is more likely to fit in. In order to optimise such a process, one can use the FAISSE index, which is the tool used to search for the closest match over the base of n-dimensional vectors. Here, we create a database containing 10k image embeddings of of the training dataset.
-
-Let us check the index performance using API calls. First, we perform a sanity check by passing the training dataset image into the index.
-
-![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/index_sanity_check_original_image.png)
-
-Then passing that image to the index returns 4 images, one of which is the original
-
-![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/index_sanity_check.png)
-
-Now, we pass user generated image of computer monitor
-
-![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/photo_2023-03-05_00-38-50.png)
-
-and get the following response
-
-![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/userimage_response.png)
-
-A noticeable feature, that we got three images of a laptop with turned on display.
 
 ## API Methods
 
 ### GET Status
+```
+import requests
 
-https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/8425fc2f54bd0a422b376bb9ad932ede8cde7976/API_templates/api_get_health_check.py#L2-L10
+host = 'http://localhost:8080'   #Localhost
 
-```  
-$ python API_templates/api_get_health_check.py 
+# API Call and print
+url =  host+'/healthcheck'
+resp = requests.get(url) 
+print(resp.json())
+```
+
+``` 
 {'message': 'API is up and running!'}
 ```
 ### POST Image Embeding
 
-https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/8425fc2f54bd0a422b376bb9ad932ede8cde7976/API_templates/api_post_image_embedings.py#L5-L15  
+```
+import os
+import requests
 
-```  
-$python API_templates/api_post_image_embedings.py 
-{'features': [-4.232490062713623, 0.03285627439618111, 1.6369472742080688, 0.8700776100158691, -1.2164239883422852, -8.073017120361328, -1.5977203845977783, -1.7229307889938354, 0.9121789336204529, 11.23184871673584, 1.3296902179718018, -3.1180896759033203, 4.341047286987305]}
+host = 'http://127.0.0.1:8080'   # local instance adress 
+
+file_path = 'Datasets\\images_fb\\images\\'                  
+file_name = '00a1664b-5017-4eb1-be6f-2439114505c5' # example with computer & software
+
+# Feature extraction
+url = host+'/predict/feature_embedding'
+file = {'image': open(file_path+file_name+'.jpg', 'rb')}
+embedings_req = requests.post(url=url,files=file)
+print(embedings_req.json())
 ```
 
-### POST Image Category
-
-https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/8425fc2f54bd0a422b376bb9ad932ede8cde7976/API_templates/api_post_category.py#L10-L20
-
 ```  
-$python API_templates/api_post_category.py 
-{'category_index': 9, 'category': 'Phones, Mobile Phones & Telecoms'}
+{'features': [0.14645007252693176, 0.1447003185749054, 0.010468872264027596, 0.018565727397799492, 0.12015146017074585, 0.072574682533741, -0.11820855736732483, -0.06668830662965775, -0.04668024182319641, 0.13109275698661804, -0.09801457077264786, 0.055759914219379425, -0.06549259275197983]}
 ```
-After proccessing:
 
-![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/query_to_index.png)
+### For Ploting the Images In Grid with Categories
+
+```
+from IPython.display import Image as Im
+from PIL import Image
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import ImageGrid
+
+def plot_image_with_category(file_path,file_name,category_str):
+    fig = plt.figure(figsize=(10., 10.), dpi=80)
+    grid = ImageGrid(fig, 111, 
+                    nrows_ncols=(2, 2), 
+                    axes_pad=0.1,
+                    )  
+    
+    img_arr = []
+    for image_ID in file_name:
+        img_arr.append(Image.open(file_path + image_ID + '.jpg'))
+    i = 0
+    for ax, im in zip(grid, img_arr):
+        ax.imshow(im)
+        ax.text(0, 30, 'Similar Images And Labels:'+str(category_str[i]), style='oblique',bbox={'facecolor': 'green', 'alpha': 0.75, 'pad': 10})
+        i +=1
+    plt.show()
+```
 
 ### POST Similar Images From Base
 
-https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/8425fc2f54bd0a422b376bb9ad932ede8cde7976/API_templates/api_post_similar_images.py#L10-L21
+```
+import requests
+import pandas as pd
+
+    
+host = 'http://127.0.0.1:8080'  
+
+file_path = 'Datasets\\images_fb\\images\\' 
+
+file_name = '00a1664b-5017-4eb1-be6f-2439114505c5' # example with Computer & Software
+
+
+# Similar Images
+url = host+'/predict/similar_images'
+file = {'image': open(file_path+file_name+'.jpg', 'rb')} 
+resp = requests.post(url=url,files=file)
+resp_dic = dict(resp.json())
+print(resp_dic)
+
+# Getting Categories of the Similar Images from the Training Data
+training_data = pd.read_csv('Datasets/training_data.csv')
+
+image_id_to_label = {row['id_x']: row['label'] for index, row in training_data.iterrows()}
+image_labels = resp_dic.get("image_labels", [])
+
+labels = [image_id_to_label[image_id] for image_id in image_labels]
+
+label_encoder = {"Home & Garden": 0, "Baby & Kids Stuff": 1, "DIY Tools & Materials": 2, "Music, Films, Books & Games": 3, "Phones, Mobile Phones & Telecoms": 4, "Clothes, Footwear & Accessories": 5, "Other Goods": 6, "Health & Beauty": 7, "Sports, Leisure & Travel": 8, "Appliances": 9, "Computers & Software": 10, "Office Furniture & Equipment": 11, "Video Games & Consoles": 12}
+category=[]
+for label in labels:
+    category.append(next(key for key, value in label_encoder.items() if value == label))
+print(category)
+
+# # Plot images
+plot_image_with_category(file_path,image_labels,category)
+```
 
 ```
-$python API_templates/api_post_similar_images.py 
-{'similar_index': [6788, 7159, 5983, 2210], 'image_labels': ['c26d58d9-91d9-4112-9c35-b50b1bf67ce4', '00ca700f-1055-43a1-b288-0193c7518347', '3ec76c1f-8dbc-429c-a7c9-85749227a06c', '136ab3a8-d0f1-4d8f-9a2e-c393d2dbb286']}
+{'similar_index': [7268, 7538, 6865, 7583], 'image_labels': ['fde1c54f-dc76-4f5f-b646-138febe6c7f4', 'd20d8da3-1a85-448f-9032-a2a52e91277d', '0b57207d-462c-43f1-8653-afbe54ad9e3a', 'a074bc84-df8f-4c09-9959-77fd54372b88']}
+['Computers & Software', 'Computers & Software', 'Computers & Software', 'Computers & Software']
 ```
 After proccessing:
 
-![plot](https://github.com/WitnessOfThe/facebook-marketplaces-recommendation-ranking-system/blob/main/readme_images/index_test_query.png)
+![plot](https://github.com/usamanaveed900/FAISS_API/blob/main/README_Images/output.png)
 
