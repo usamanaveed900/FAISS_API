@@ -1,11 +1,11 @@
 # FAISS FAST API
-### Facebook Marketplace Image-based Recommendation
+## Facebook Marketplace Image-based Recommendation
 
 In this project, we have implemented the FAST API in a docker container, to be deployed in the cloud. The API provides a method that is categorizing images into 13 product categories and searches for similar images from the image database. The model is based on ResNet50 neural networks and indexing is performed by the FAISS indexing.
 
 Key technologies used: Resnet50 neural network (Pytorch), FAISS indexing, FastAPI, Docker 
 
-# Model 
+## Model 
 
 The model used is the ResNet50 neural network, which is a CNN and can be used for image classification. to make efficient categorization we used the transfer learning approach and load the weights of the resnet50 model "IMAGENET1k_V2" which is trained to perform classification on 1K different classes. As we only had 13 classes, we need to resize the model classification layers and unfreeze the last 2 layers of the pre-trained model. This way our model adopts more to our database.
 
@@ -155,4 +155,6 @@ plot_image_with_category(file_path,image_labels,category)
 After proccessing:
 
 ![plot](https://github.com/usamanaveed900/FAISS_API/blob/main/README_Images/output.png)
+
+
 
